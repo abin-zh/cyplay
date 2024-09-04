@@ -77,6 +77,7 @@ export struct HomeHeader{
       .width('100%')
       .height(45)
       .alignListItem(ListItemAlign.End)
+      .padding({left: 8, right: 8})
     }
   }
 
@@ -92,7 +93,7 @@ export struct HomeHeader{
       .alignSelf(ItemAlign.Center)
       // 增加的空间全部分配给搜索框
       .layoutWeight(1)
-    }
+    }.padding({top: 8, bottom: 8})
   }
 }
 

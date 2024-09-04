@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { Home } from '@ohos/home'
 
 AppStorage.setOrCreate("currentBreakpoint", "sm");
@@ -8,13 +7,12 @@ AppStorage.setOrCreate("currentBreakpoint", "sm");
 export struct Index {
   @StorageLink("currentBreakpoint") currentBreakpoint: String = "sm"
   @State private currentIndex: Number = 0
-  pathStack: NavPathStack = new NavPathStack()
 
   build() {
-      Navigation(this.pathStack) {
-        // 修改断点的取值范围同时启用更多断点，注意，修改的断点值后面必须加上vp单位。
-        GridRow() {
-          GridCol({span:{xs: 12, sm: 12, md: 12, lg:12, xl: 12, xxl:12}}) {
+
+          // 修改断点的取值范围同时启用更多断点，注意，修改的断点值后面必须加上vp单位。
+          GridRow() {
+            GridCol({span:{xs: 12, sm: 12, md: 12, lg:12, xl: 12, xxl:12}}) {
             Tabs({ barPosition: this.currentBreakpoint === "lg" ? BarPosition.Start : BarPosition.End }) {
               TabContent() {
                 Column() {
@@ -47,9 +45,6 @@ export struct Index {
         }.onBreakpointChange((currentBreakpoint: string) => {
           this.currentBreakpoint = currentBreakpoint
         })
-      }
-      .mode(NavigationMode.Stack)
-      .hideTitleBar(true)
   }
 
   @Builder
