@@ -43,6 +43,14 @@
     {
       "name": "home",
       "srcPath": "./features/home",
+    },
+    {
+      "name": "file",
+      "srcPath": "./features/file",
+    },
+    {
+      "name": "setting",
+      "srcPath": "./features/setting"
     }
   ]
 }

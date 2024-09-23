@@ -1,30 +1,10 @@
-// 扩展 文字通用样式
-@Extend(Text)
-function selectedStyle() {
-  .fontSize(18)
-  .fontColor("#007DFF")
-  .fontWeight("bold")
-  .decoration({ type: TextDecorationType.Underline, color: "#0077DFF" })
-}
-
-@Extend(Text)
-function defaultStyle() {
-  .fontSize(16)
-  .fontColor('#000000')
-  .fontWeight('normal')
-}
-
-// 添加这个接口定义
-interface TabItem {
-  name: string;
-  view?: string;
-  path?: string;
-}
+import { TabItem } from '../viewmodel/TableItem'
 
 @Component
 export struct HomeHeader {
-  @Consume('pathStack') pathStack: NavPathStack;
-  @State selected: string = "MainView";
+  @Consume('pathStack') pathStack: NavPathStack
+  @Consume('tabList') tabList: Array<TabItem>
+  @Consume('currentIndex') currentIndex: number
 
   build() {
     GridRow({
@@ -64,32 +44,24 @@ export struct HomeHeader {
   TopTabBar() {
     Row() {
       List({ space: 16 }) {
-        ForEach([
-          { name: "首页", view: "MainView", path: "HomeView" },
-          { name: "动漫追更", view: "CateView", path: "CateView" },
-          { name: "原盘番剧" },
-          { name: "国产剧集" },
-          { name: "播放列表" },
-          { name: "日韩剧集" },
-          { name: "欧美剧集" },
-          { name: "演唱会" },
-          { name: "电影" },
-          { name: "综艺节目" }
-        ], (item: TabItem) => {
+        ForEach(this.tabList, (item: TabItem, index: number) => {
           ListItem() {
-            if (item.view && this.selected == item.view) {
-              Text(item.name)
+            if (index == this.currentIndex) {
+              Text(item.Name)
                 .selectedStyle()
             } else {
-              Text(item.name)
+              Text(item.Name)
                 .defaultStyle()
             }
           }
           .onClick(() => {
-            if (item.view) {
-              this.selected = item.view
-              this.pathStack.clear()
-              this.pathStack.pushPath({ name: item.path })
+            //索引相同无切换
+            if(index == this.currentIndex) return;
+            this.currentIndex = index
+            if (item.isHome == null) {
+              this.pathStack.pushPathByName("CateView", "123", true)
+            } else {
+              this.pathStack.pushPathByName("HomeView", null, true)
             }
           })
         })
@@ -98,7 +70,7 @@ export struct HomeHeader {
       .listDirection(Axis.Horizontal)
       .width('100%')
       .height(45)
-      .padding({top: 4,left: 8, right: 8 })
+      .padding({ top: 4, left: 8, right: 8 })
       .alignListItem(ListItemAlign.Center)
     }
   }
@@ -116,4 +88,19 @@ export struct HomeHeader {
       .layoutWeight(1)
     }
   }
+}
+
+// 扩展 文字通用样式
+@Extend(Text)
+function selectedStyle() {
+  .fontSize(18)
+  .fontColor("#007DFF")
+  .fontWeight("bold")
+}
+
+@Extend(Text)
+function defaultStyle() {
+  .fontSize(16)
+  .fontColor('#000000')
+  .fontWeight('normal')
 }

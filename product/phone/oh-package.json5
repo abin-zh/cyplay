@@ -7,6 +7,8 @@
   "license": "",
   "dependencies": {
     "@ohos/common": "file:../../common",
-    "@ohos/home": "file:../../features/home"
+    "@ohos/home": "file:../../features/home",
+    "@ohos/file": "file:../../features/file",
+    "@ohos/mine": "file:../../features/setting"
   }
 }

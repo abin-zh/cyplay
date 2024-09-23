@@ -1,11 +1,16 @@
+import { File } from '@ohos/file';
 import { Home } from '@ohos/home'
+import { Setting } from '@ohos/mine';
 
 AppStorage.setOrCreate("currentBreakpoint", "sm");
+
 
 @Entry
 @Component
 struct Index {
   @StorageLink("currentBreakpoint") currentBreakpoint: String = "sm"
+  @StorageProp("bottomRectHeight") bottomRectHeight: number = 0
+  @StorageProp("topRectHeight") topRectHeight: number = 0
   @State private currentIndex: Number = 0
 
   build() {
@@ -29,14 +34,14 @@ struct Index {
           .tabBar(this.tabBuilder('首页', 0, $r('app.media.home'), $r("app.media.home_active")))
 
           TabContent() {
-            Text("文件")
+            File()
           }
           .tabBar(this.tabBuilder('文件', 1, $r('app.media.document'), $r("app.media.document_active")))
 
           TabContent() {
-            Text("其他")
+            Setting()
           }
-          .tabBar(this.tabBuilder('我的', 2, $r('app.media.profile'), $r("app.media.profile_active")))
+          .tabBar(this.tabBuilder('设置', 2, $r('app.media.setting'), $r("app.media.setting_active")))
         }
         .barWidth(this.currentBreakpoint === "lg" ? 100 : '100%')
         .barHeight(this.currentBreakpoint === "lg" ? '100%' : 45)
@@ -50,7 +55,9 @@ struct Index {
           this.currentIndex = index
         })
       }
-    }.onBreakpointChange((currentBreakpoint: string) => {
+    }
+    .padding({ top: px2vp(this.topRectHeight + 18), bottom: px2vp(this.bottomRectHeight) })
+    .onBreakpointChange((currentBreakpoint: string) => {
       this.currentBreakpoint = currentBreakpoint
     })
   }

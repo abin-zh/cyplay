@@ -1,1 +1,2 @@
-export { MainPage } from './src/main/ets/components/MainPage'
+export { LoginParams } from './src/main/ets/model/LoginParams';
+export { embyLogin, embyViews } from './src/main/ets/api/User';

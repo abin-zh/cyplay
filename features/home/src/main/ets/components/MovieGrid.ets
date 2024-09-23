@@ -1,8 +1,9 @@
 import { Movie } from '../viewmodel/Movie';
 import display from '@ohos.display';
+import { MovieItem } from './MovieItem';
 
 @Component
-export struct MovieTab {
+export struct MovieGrid {
   @StorageProp("currentBreakpoint") currentBreakpoint: string = "sm";
   @State movieList: Array<Movie> = [
     new Movie('238', '教父', 'https://image.tmdb.org/t/p/original/y03tzUKvkRCYwJ5NWys4W4bnS9m.jpg'),
@@ -14,63 +15,90 @@ export struct MovieTab {
     new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
     new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
     new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
-   ]
+    new Movie('238', '教父', 'https://image.tmdb.org/t/p/original/y03tzUKvkRCYwJ5NWys4W4bnS9m.jpg'),
+    new Movie('240', '教父2', 'https://image.tmdb.org/t/p/original/4J8jUmjgKPggRPJqqdkjWCj2k0D.jpg'),
+    new Movie('424', '辛德勒的名单', 'https://image.tmdb.org/t/p/original/kukYu89yda6NrifW5kpLoOTU7YH.jpg'),
+    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
+    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
+    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
+    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
+    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
+    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
+  ]
 
   build() {
     Grid() {
-      ForEach(this.movieList, (item: Movie, index: number) => {
+      ForEach(this.movieList, (item: Movie) => {
         GridItem() {
-          Column() {
-            Stack({ alignContent: Alignment.Bottom }) {
-              Column() {
-                Image(item.imgUrl)
-                  .borderRadius(16)
-                  .shadow({
-                    radius: 16,
-                    color: "#e3e3e3",
-                    offsetX: 1,
-                    offsetY: 1
-                  })
-                Text(item.name)
-                  .fontWeight(FontWeight.Bold)
-                  .height(45)
-              }
-              .width(this.currentBreakpoint == 'lg' ? 100 * 1.5 : 100)
-              .height(this.currentBreakpoint == 'lg' ? 150 * 1.5 : 150)
-            }
-            // 宽高按照预设的比例，随容器组件发生变化且宽高比不变
-            .aspectRatio(0.66)
-          }
+          MovieItem({ movie: item, currentBreakpoint: this.currentBreakpoint })
         }
       }, (item: Movie, index: number) => index + JSON.stringify(item))
     }
-    // 设置网格布局列数,均分宽度
-    .columnsTemplate(this.currentBreakpoint == "lg" ? '1fr 1fr 1fr 1fr 1fr 1fr' : '1fr 1fr 1fr')
+    .columnsTemplate(this.getColumnsTemplate(this.currentBreakpoint))
+    .edgeEffect(EdgeEffect.Spring)
     .columnsGap(16)
-    .rowsTemplate('1fr 1fr 1fr 1fr')
     .rowsGap(16)
-    // 根据不同断点下列数动态计算总高度，保持图片宽高比不变
-    .height(this.getGridHeight(this.currentBreakpoint == "lg" ? 6 : 3, this.currentBreakpoint,
-      display.getDefaultDisplaySync().width))
+  }
 
+  getMovieImgAspectRatio(currentBreakpoin: string): number{
+    switch (currentBreakpoin){
+      case 'sm':
+      case 'md': return 1;
+      case 'lg': return 1.2;
+    }
+    return 1;
+  }
+
+  /**
+   * 获取列数
+   * @param currentBreakpoint 当前断点
+   * @returns
+   */
+  getColumnCount(currentBreakpoint: string): number {
+    switch (currentBreakpoint){
+      case 'sm': return 3;
+      case 'md': return 5;
+      case 'lg': return 6;
+    }
+    return 3;
+  }
+
+  /**
+   * 获取列模板
+   * @param currentBreakpoint 当前断点
+   * @returns
+   */
+  getColumnsTemplate(currentBreakpoint: string): string {
+    const columnCount = this.getColumnCount(currentBreakpoint);
+    return '1fr '.repeat(columnCount).trim();
+  }
+
+  /**
+   * 获取行模板
+   * @param currentBreakpoint 当前断点
+   * @returns
+   */
+  getRowsTemplate(currentBreakpoint: string): string {
+    const rowCount = Math.ceil(this.movieList.length / this.getColumnCount(currentBreakpoint)) + 1;
+    return '1fr '.repeat(rowCount).trim();
   }
 
   // 计算网格布局总高度
-  getGridHeight(videoGridColumn: number, currentBreakpoint: string, windowWidth: number): number {
+  getGridHeight(videoGridColumn: number, currentBreakpoint: string, windowWidth: number, listLength: number): number {
     // 获取窗口宽度，减掉两侧空白部分
     let result: number = px2vp(windowWidth) - 32;
     if (currentBreakpoint === 'lg') {
       result = result - 100;
     }
+
     // 根据网格列数计算单张图片宽度
-    if (videoGridColumn == 3) {
-      result = (result - 16 * 2) / videoGridColumn;
-    } else if (videoGridColumn == 4) {
-      result = (result - 16 * 3) / videoGridColumn;
+    if (videoGridColumn <= 1) {
+      return 300;
     } else {
-      result = (result - 16 * 4) / videoGridColumn;
+      result = (result - 16 * (videoGridColumn -   1)) / videoGridColumn;
     }
+
     // 计算单张图片高度及标题、内容高度，相加计算网格布局总高度
-    return (result / 0.66 + 45) * 4;
+    return (result / 0.66 + 45) * Math.ceil(listLength / videoGridColumn + 1);
   }
 }

@@ -26,7 +26,7 @@ export struct Banner {
               .borderRadius(16)
               .zIndex(99)
           }.alignContent(Alignment.Bottom)
-            .aspectRatio(this.currentBreakpoint == "sm" ? 1.78 : 2.33)
+            .aspectRatio(this.currentBreakpoint == "lg" ? 2.33 : 1.78)
         }
       }, (item: Banner, index: number) => index + JSON.stringify(item))
     }

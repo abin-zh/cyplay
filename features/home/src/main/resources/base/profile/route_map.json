@@ -1,0 +1,20 @@
+{
+  "routerMap": [
+    {
+      "name": "HomeView",
+      "pageSourceFile": "src/main/ets/views/HomeView.ets",
+      "buildFunction": "HomeViewBuilder",
+      "data": {
+        "description" : "this is HomeView"
+      }
+    },
+    {
+      "name": "CateView",
+      "pageSourceFile": "src/main/ets/views/CateView.ets",
+      "buildFunction": "CateViewBuilder",
+      "data": {
+        "description" : "this is CateView"
+      }
+    }
+  ]
+}
