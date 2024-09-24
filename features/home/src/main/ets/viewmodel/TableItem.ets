@@ -1,4 +1,6 @@
-// 添加这个接口定义
+import { Movie } from '@ohos/common'
+
+@Observed
 export class  TabItem {
   private _Id: string
 
@@ -40,12 +42,23 @@ export class  TabItem {
     return this._isHome
   }
 
-  constructor(Id: string, Name: string, CollectionType: string | null, isHome: boolean | null) {
+  private _Latest: Array<Movie>
+
+  public set Latest(value: Array<Movie>) {
+    this._Latest = value
+  }
+
+  public get Latest(): Array<Movie> {
+    return this._Latest
+  }
+
+
+  constructor(Id: string, Name: string, CollectionType: string | null, isHome: boolean | null, Latest?: Array<Movie>) {
     this._Id = Id
     this._Name = Name
     this._CollectionType = CollectionType
     this._isHome = isHome
+    this._Latest = new Array<Movie>()
   }
-
 
 }

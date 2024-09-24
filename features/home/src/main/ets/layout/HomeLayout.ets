@@ -1,9 +1,7 @@
 import { HomeHeader } from '../components/HomeHeader'
 import { TabItem } from '../viewmodel/TableItem'
 import { display } from '@kit.ArkUI'
-import hilog from '@ohos.hilog'
-import { HomeView } from '../views/HomeView'
-import { embyLogin, embyViews, LoginParams } from '@ohos/common'
+import { embyLatest, embyLogin, embyResume, embyViews, LoginParams, Movie } from '@ohos/common'
 
 @Component
 export struct Home {
@@ -11,31 +9,55 @@ export struct Home {
   @StorageProp("currentBreakpoint") currentBreakpoint: String = "sm"
   @StorageProp("bottomRectHeight") bottomRectHeight: number = 0
   @StorageProp("topRectHeight") topRectHeight: number = 0
+  @StorageProp("userId") userId: string = ''
+
   //页面栈
   @Provide('pathStack') pathStack: NavPathStack = new NavPathStack()
   //tab列表
   @Provide('tabList') tabList: Array<TabItem> = []
+  //tab列表
+  @Provide('bannerList') bannerList: Array<Movie> = []
   //当前tab索引
   @Provide('currentIndex') currentIndex: number = 0
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    this.tabList.push(new TabItem("0001", "首页", null, true))
     let accessToken: string | undefined = AppStorage.get("accessToken")
     if (accessToken == undefined) {
-      embyLogin(new LoginParams("abin9996", "863030357")).then(res => {
+      await embyLogin(new LoginParams("abin9996", "863030357")).then(res => {
         if (res?.data) {
           AppStorage.SetOrCreate("accessToken", res.data.AccessToken)
           AppStorage.SetOrCreate("userId", res.data.User.Id)
-          embyViews(res.data.User.Id).then(res => {
-            if (res?.data) {
-              this.tabList.push(new TabItem("0001", "首页", null, true))
-              res.data.Items.forEach((item: TabItem) => {
-                this.tabList.push(item)
-              })
-            }
-          })
         }
       })
     }
+
+    await embyViews(this.userId).then(res => {
+      if (res?.data) {
+        res.data.Items.forEach((item: TabItem) => {
+          this.tabList.push(item)
+        })
+      }
+    })
+
+    this.tabList.forEach((item, index) => {
+      if(item?.CollectionType && item.CollectionType != 'playlists'){
+        embyLatest(this.userId, item.Id).then(res => {
+          if(res?.data){
+            this.tabList[index].Latest = res.data;
+            this.tabList = [...this.tabList]
+          }
+        })
+      }
+    })
+
+    embyResume(this.userId).then(res => {
+      if(res?.data){
+        this.bannerList = res.data.Items
+        this.bannerList = [...this.bannerList]
+      }
+    })
+
   }
 
   build() {
@@ -61,7 +83,7 @@ export struct Home {
                 if (--index >= 0) {
                   const item = this.tabList[index];
                   //左滑返回
-                  this.pathStack.popToName(
+                  this.pathStack.replacePathByName(
                     item.isHome != null ? "HomeView" : "CateView", item.Id, true
                   )
                   this.currentIndex = index
@@ -70,7 +92,7 @@ export struct Home {
                 if (++index < this.tabList.length) {
                   const item = this.tabList[index];
                   //右滑前进
-                  this.pathStack.pushPathByName("CateView", item.Id, true)
+                  this.pathStack.replacePathByName("CateView", item.Id, true)
                   this.currentIndex = index
                 }
               }

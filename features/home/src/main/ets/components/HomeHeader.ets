@@ -59,9 +59,9 @@ export struct HomeHeader {
             if(index == this.currentIndex) return;
             this.currentIndex = index
             if (item.isHome == null) {
-              this.pathStack.pushPathByName("CateView", "123", true)
+              this.pathStack.replacePathByName("CateView", item.Id, true)
             } else {
-              this.pathStack.pushPathByName("HomeView", null, true)
+              this.pathStack.replacePathByName("HomeView", null, true)
             }
           })
         })

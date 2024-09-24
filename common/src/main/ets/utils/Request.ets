@@ -3,15 +3,17 @@ import http from '@ohos.net.http';
 //响应格式
 import Response from '../model/Response'
 
-const baseInfo = '?X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Google%20Chrome%20Windows&X-Emby-Device-Id=e801a66d-b73e-4004-a26a-2506a8a142ce&X-Emby-Client-Version=4.8.0.10'
+const baseInfo =
+  '?X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Google%20Chrome%20Windows&X-Emby-Device-Id=25304609-0bf2-ce11-954e-92ad96242efb&X-Emby-Client-Version=4.8.0.10'
+const httpRequest = http.createHttp();
 
 //导出去一个请求函数 使用axios风格请求数据、参数可自行增加
-export function request(url: string, method: http.RequestMethod, data?: object): Promise<Response> {
-  const BASE_URL = "https://emby2.misakaf.org"
-  let httpRequest = http.createHttp();
+export function request(url: string, method: http.RequestMethod, data?: object, params?: string): Promise<Response> {
+  const BASE_URL = "https://emby2.misakaf.org/emby"
   const accessToken: string | undefined = AppStorage.get("accessToken")
-  let xEmbyToken = (accessToken != undefined ? '&X-Emby-Token=' + accessToken : '')
-  let responseResult = httpRequest.request(BASE_URL + url + baseInfo + xEmbyToken, {
+  let xEmbyToken = accessToken != undefined ? '&X-Emby-Token=' + accessToken : ''
+  params = params != undefined ? ('&' + params) : ''
+  let responseResult = httpRequest.request(BASE_URL + url + baseInfo + xEmbyToken + params, {
     method: method,
     //请求头设置
     header: {

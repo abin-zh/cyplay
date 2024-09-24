@@ -1,24 +1,44 @@
-import { Movie } from '../viewmodel/Movie';
+import { Movie } from '@ohos/common';
 
 @Component
 export struct MovieItem {
-  @Prop movie: Movie;
+  @ObjectLink movie: Movie;
   @Prop currentBreakpoint: string;
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
-        Image(this.movie.imgUrl)
-          .borderRadius(16)
-          .shadow({
-            radius: 16,
-            color: "#e3e3e3",
-            offsetX: 1,
-            offsetY: 1
-          })
-        Text(this.movie.name)
+        Flex({justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center}){
+          if (this.movie?.ImageTags?.Primary) {
+            Image(`https://emby2.misakaf.org/emby/Items/${this.movie.Id}/Images/Primary?maxHeight=296&maxWidth=198&tag=${this.movie.ImageTags.Primary}&quality=90`)
+              .borderRadius(16)
+              .shadow({
+                radius: 16,
+                color: "#e3e3e3",
+                offsetX: 1,
+                offsetY: 1
+              })
+          } else {
+            Image($r('app.media.file'))
+              .height(50)
+              .width(50)
+          }
+        }
+        .borderRadius(16)
+        .shadow({
+          radius: 16,
+          color: "#e3e3e3",
+          offsetX: 1,
+          offsetY: 1
+        })
+        .height('100%')
+
+        Text(this.movie.Name)
           .fontWeight(FontWeight.Bold)
           .height(45)
+          .textAlign(TextAlign.Center)
+          .textOverflow({overflow: TextOverflow.Ellipsis})
+          .maxLines(1)
       }
       .width(this.getMovieImgAspectRatio(this.currentBreakpoint) * 100)
       .height(this.getMovieImgAspectRatio(this.currentBreakpoint) * 150)

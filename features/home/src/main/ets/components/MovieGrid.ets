@@ -1,43 +1,36 @@
-import { Movie } from '../viewmodel/Movie';
-import display from '@ohos.display';
+import { Movie } from '@ohos/common';
 import { MovieItem } from './MovieItem';
 
 @Component
 export struct MovieGrid {
   @StorageProp("currentBreakpoint") currentBreakpoint: string = "sm";
-  @State movieList: Array<Movie> = [
-    new Movie('238', '教父', 'https://image.tmdb.org/t/p/original/y03tzUKvkRCYwJ5NWys4W4bnS9m.jpg'),
-    new Movie('240', '教父2', 'https://image.tmdb.org/t/p/original/4J8jUmjgKPggRPJqqdkjWCj2k0D.jpg'),
-    new Movie('424', '辛德勒的名单', 'https://image.tmdb.org/t/p/original/kukYu89yda6NrifW5kpLoOTU7YH.jpg'),
-    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
-    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
-    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
-    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
-    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
-    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
-    new Movie('238', '教父', 'https://image.tmdb.org/t/p/original/y03tzUKvkRCYwJ5NWys4W4bnS9m.jpg'),
-    new Movie('240', '教父2', 'https://image.tmdb.org/t/p/original/4J8jUmjgKPggRPJqqdkjWCj2k0D.jpg'),
-    new Movie('424', '辛德勒的名单', 'https://image.tmdb.org/t/p/original/kukYu89yda6NrifW5kpLoOTU7YH.jpg'),
-    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
-    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
-    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
-    new Movie('278', '肖申克的救赎', 'https://image.tmdb.org/t/p/original/x6cLNyJWKK7jdaqL9UNPlvJJoVD.jpg'),
-    new Movie('129', '千与千寻', 'https://image.tmdb.org/t/p/original/qIVSUzgVfg1citQeZdBDGKTinUb.jpg'),
-    new Movie('13', '阿甘正传', 'https://image.tmdb.org/t/p/original/Ac68G8LkY4AJL6lXpClRP4uJMRV.jpg'),
-  ]
+  @Consume('movies') movies: Array<Movie>
+  @Consume('loading') loading: boolean
 
   build() {
-    Grid() {
-      ForEach(this.movieList, (item: Movie) => {
-        GridItem() {
-          MovieItem({ movie: item, currentBreakpoint: this.currentBreakpoint })
-        }
-      }, (item: Movie, index: number) => index + JSON.stringify(item))
+    if(this.loading){
+      Flex({justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center}){
+        Text("等待中...")
+          .fontWeight(FontWeight.Bold)
+          .fontSize(18)
+          .fontColor("#007DFF")
+      }
+      .width('100%')
+      .height('100%')
+    } else {
+      Grid() {
+        ForEach(this.movies, (item: Movie) => {
+          GridItem() {
+            MovieItem({ movie: item, currentBreakpoint: this.currentBreakpoint })
+          }
+        }, (item: Movie, index: number) => index + JSON.stringify(item))
+      }
+      .columnsTemplate(this.getColumnsTemplate(this.currentBreakpoint))
+      .edgeEffect(EdgeEffect.Spring)
+      .columnsGap(16)
+      .rowsGap(16)
+      .scrollBarWidth(0)
     }
-    .columnsTemplate(this.getColumnsTemplate(this.currentBreakpoint))
-    .edgeEffect(EdgeEffect.Spring)
-    .columnsGap(16)
-    .rowsGap(16)
   }
 
   getMovieImgAspectRatio(currentBreakpoin: string): number{
@@ -79,7 +72,7 @@ export struct MovieGrid {
    * @returns
    */
   getRowsTemplate(currentBreakpoint: string): string {
-    const rowCount = Math.ceil(this.movieList.length / this.getColumnCount(currentBreakpoint)) + 1;
+    const rowCount = Math.ceil(this.movies.length / this.getColumnCount(currentBreakpoint)) + 1;
     return '1fr '.repeat(rowCount).trim();
   }
 
